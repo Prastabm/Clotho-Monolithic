@@ -1,0 +1,110 @@
+{
+  "info": {
+    "name": "Monolithic Firebase Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Firebase: Login (Get ID Token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@admin.clotho.com\",\n  \"password\": \"<ENTER_PASSWORD>\",\n  \"returnSecureToken\": true\n}"
+        },
+        "url": {
+          "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=<FIREBASE_WEB_API_KEY>",
+          "protocol": "https",
+          "host": ["identitytoolkit", "googleapis", "com"],
+          "path": ["v1", "accounts:signInWithPassword"],
+          "query": [
+            { "key": "key", "value": "<FIREBASE_WEB_API_KEY>" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /auth/me",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{idToken}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/auth/me",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["auth", "me"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET inventory by SKU",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{idToken}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/inventory/sku/ABC123",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["inventory", "sku", "ABC123"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST create/update inventory",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{idToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"skuCode\": \"ABC123\",\n  \"quantity\": 100\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/inventory",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["inventory"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE inventory",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{idToken}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/inventory/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["inventory", "1"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "idToken",
+      "value": ""
+    }
+  ]
+}

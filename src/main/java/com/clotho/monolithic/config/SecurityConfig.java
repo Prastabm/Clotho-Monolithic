@@ -1,33 +1,42 @@
 package com.clotho.monolithic.config;
 
+import com.clotho.monolithic.common.security.FirebaseJwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    // Completely disables default security and in-memory login
+    private final FirebaseJwtAuthenticationFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("✅ Custom SecurityConfig loaded — all routes are open");
-
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
-                .httpBasic(Customizer.withDefaults()) // Required to prevent auto-login form
-                .formLogin(form -> form.disable())    // Disable login page
-                .build();
-    }
+                        // Public auth routes
+                        .requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth/test-api-key").permitAll()
 
-    // Prevent auto-configured user details service from kicking in
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> null;
+                        // Admin-only endpoints
+                        .requestMatchers(HttpMethod.POST, "/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
+
+                        // Authenticated access
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }
