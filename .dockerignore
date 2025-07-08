@@ -1,0 +1,25 @@
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+
+# Docker - DO NOT ignore Dockerfile unless you're 100% sure
+# Remove these lines:
+# Dockerfile
+# docker-compose.yml
+# .dockerignore
+
+# Optional: Ignore .env files only if they contain secrets or are local-only
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

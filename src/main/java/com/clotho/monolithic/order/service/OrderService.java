@@ -20,7 +20,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public void placeOrder(OrderRequest orderRequest) {
+    public void placeOrder(OrderRequest orderRequest, String userEmail) {
         List<OrderLineItem> orderLineItems = orderRequest.getOrderLineItems().stream()
                 .map(this::mapToEntity)
                 .toList();
@@ -30,11 +30,16 @@ public class OrderService {
                 .orderDate(LocalDateTime.now())
                 .status("CREATED")
                 .address(orderRequest.getAddress())
+                .email(userEmail)
                 .orderLineItems(orderLineItems)
                 .build();
 
         orderLineItems.forEach(item -> item.setOrder(order));
         orderRepository.save(order);
+    }
+
+    public List<Order> getOrdersByEmail(String email) {
+        return orderRepository.findByEmail(email);
     }
 
     private OrderLineItem mapToEntity(OrderLineItemDto dto) {
@@ -44,4 +49,6 @@ public class OrderService {
                 .quantity(dto.getQuantity())
                 .build();
     }
+
+
 }

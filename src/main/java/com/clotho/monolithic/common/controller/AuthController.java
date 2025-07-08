@@ -194,18 +194,10 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Unauthenticated"));
-        }
-
         String email = authentication.getName();
         String role = authentication.getAuthorities().stream()
                 .findFirst().map(Object::toString).orElse("UNKNOWN");
 
-        return ResponseEntity.ok(Map.of(
-                "email", email,
-                "role", role
-        ));
+        return ResponseEntity.ok(Map.of("email", email, "role", role));
     }
 }
