@@ -24,6 +24,11 @@ public class InventoryController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Inventory> updateInventory(@PathVariable Long id, @RequestBody Inventory inventory) {
+        inventory.setId(id); // Ensure the ID is set
+        return ResponseEntity.ok(inventoryService.createOrUpdateInventory(inventory));
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInventory(@PathVariable Long id) {

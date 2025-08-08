@@ -2,6 +2,9 @@ package com.clotho.monolithic.common.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.ExportedUserRecord;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.ListUsersPage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -45,7 +48,23 @@ public class AuthController {
             return ResponseEntity.ok("API key works (got different error: " + e.getMessage() + ")");
         }
     }
-
+    @GetMapping("/user-count")
+    public ResponseEntity<?> getUserCount() {
+        try {
+            ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
+            int count = 0;
+            while (page != null) {
+                for (ExportedUserRecord user : page.getValues()) {
+                    count++;
+                }
+                page = page.getNextPage();
+            }
+            return ResponseEntity.ok(Map.of("userCount", count));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to fetch user count: " + e.getMessage()));
+        }
+    }
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");

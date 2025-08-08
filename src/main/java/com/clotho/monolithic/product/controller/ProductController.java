@@ -42,6 +42,32 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long id,
+            @RequestPart("product") Product updatedProduct,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+
+        return productService.getProductById(id).map(existingProduct -> {
+            // Update fields
+            existingProduct.setName(updatedProduct.getName());
+            existingProduct.setDescription(updatedProduct.getDescription());
+            existingProduct.setPrice(updatedProduct.getPrice());
+            existingProduct.setCategory(updatedProduct.getCategory());
+            existingProduct.setSkuCode(updatedProduct.getSkuCode());
+
+            // Handle image upload if a new file is provided
+            if (file != null && !file.isEmpty()) {
+                String fileUrl = supabaseStorageService.uploadFile(file);
+                existingProduct.setImageUrl(fileUrl);
+            }
+
+            Product savedProduct = productService.createProduct(existingProduct);
+            return ResponseEntity.ok(savedProduct);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

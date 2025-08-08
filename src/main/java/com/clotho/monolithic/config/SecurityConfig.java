@@ -20,30 +20,37 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configure(http))
+                .csrf(csrf -> csrf.disable()) // CSRF is already disabled
                 .authorizeHttpRequests(auth -> auth
-                        // Public authentication endpoints
-                        .requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        // 🔓 Public endpoints
+                        .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/test-api-key").permitAll()
+                        .requestMatchers("/api/stripe/webhook").permitAll() // ✅ ALLOW STRIPE WEBHOOKS
 
-                        // Authenticated users can see their info
+                        // 🔐 Auth endpoints
                         .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
 
-                        // Admin-only product & inventory modifications
+                        // 🛒 Cart access for authenticated users
+                        .requestMatchers(HttpMethod.GET, "/api/cart/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/cart/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/cart/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/cart/**").authenticated()
+
+                        // 👤 Users (not admins) can place orders
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
+
+                        // 👮 Admin-only product & inventory updates
                         .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/inventory/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/inventory/**").hasRole("ADMIN")
 
-                        // Authenticated users (including USER and ADMIN) can view products/inventory
-                        .requestMatchers(HttpMethod.GET, "/products/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/inventory/**").authenticated()
+                        // 📦 Everyone logged in can view products/inventory
+                        .requestMatchers(HttpMethod.GET, "/products/**", "/inventory/**").authenticated()
 
-                        // Only normal USERS (not ADMIN) can place orders
-                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
-
-                        // All other endpoints require authentication
+                        // 🌐 Default: all other endpoints require auth
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
