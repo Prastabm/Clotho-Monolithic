@@ -15,7 +15,7 @@ import java.io.InputStream;
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${firebase.service-account-key:firebase-service-account-key.json}")
+    @Value("${firebase.service-account-key:/etc/secrets/firebase-service-account-key.json}")
     private String serviceAccountKeyPath;
 
     @PostConstruct
