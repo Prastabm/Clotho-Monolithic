@@ -9,5 +9,7 @@ import lombok.*;
 public class OrderLineItemDto {
     private String skuCode;
     private Double price;
+    private String category;
     private Integer quantity;
+
 }

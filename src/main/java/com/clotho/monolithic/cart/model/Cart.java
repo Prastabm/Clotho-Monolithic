@@ -16,6 +16,7 @@ public class Cart {
     private Long id;
 
     private String skuCode; // or skuCode
+    private String category;
     private String email;
     private Integer quantity;
     private Double price; // optional: useful during checkout to lock price

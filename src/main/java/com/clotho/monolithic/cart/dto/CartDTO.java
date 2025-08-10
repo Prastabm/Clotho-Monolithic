@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 public class CartDTO {
     private String skuCode;
+    private String category;
     private Integer quantity;
     private Double price;
 }

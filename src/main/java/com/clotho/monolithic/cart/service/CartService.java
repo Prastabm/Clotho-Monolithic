@@ -20,6 +20,7 @@ public class CartService {
     public void addToCart(String email, CartDTO dto) {
         Cart item = Cart.builder()
                 .skuCode(dto.getSkuCode())
+                .category(dto.getCategory())
                 .email(email)
                 .quantity(dto.getQuantity())
                 .price(dto.getPrice())
@@ -51,6 +52,7 @@ public class CartService {
         return getUserCart(email).stream()
                 .map(item -> OrderLineItemDto.builder()
                         .skuCode(item.getSkuCode())
+                        .category(item.getCategory())
                         .price(item.getPrice())
                         .quantity(item.getQuantity())
                         .build())

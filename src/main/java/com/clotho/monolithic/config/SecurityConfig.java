@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/test-api-key").permitAll()
                         .requestMatchers("/api/stripe/webhook").permitAll() // ✅ ALLOW STRIPE WEBHOOKS
+                        .requestMatchers(HttpMethod.POST, "/api/communication/**").permitAll()
 
                         // 🔐 Auth endpoints
                         .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
@@ -39,6 +40,7 @@ public class SecurityConfig {
 
                         // 👤 Users (not admins) can place orders
                         .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/all").hasRole("ADMIN")
 
                         // 👮 Admin-only product & inventory updates
                         .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")

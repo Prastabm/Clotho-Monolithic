@@ -70,6 +70,7 @@ public class OrderService {
         orderRequest.setOrderLineItems(cartItems.stream()
                 .map(item -> OrderLineItemDto.builder()
                         .skuCode(item.getSkuCode())
+                        .category(item.getCategory())
                         .price(item.getPrice())
                         .quantity(item.getQuantity())
                         .build())
@@ -105,9 +106,14 @@ public class OrderService {
         return orderRepository.findByEmail(email);
     }
 
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
     private OrderLineItem mapToEntity(OrderLineItemDto dto) {
         return OrderLineItem.builder()
                 .skuCode(dto.getSkuCode())
+                .category(dto.getCategory())
                 .price(dto.getPrice())
                 .quantity(dto.getQuantity())
                 .build();
