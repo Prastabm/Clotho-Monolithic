@@ -23,7 +23,7 @@ public class FirebaseConfig {
         try {
             // Check if Firebase app is already initialized
             if (FirebaseApp.getApps().isEmpty()) {
-                InputStream serviceAccount = new ClassPathResource(serviceAccountKeyPath).getInputStream();
+                InputStream serviceAccount = new ClassPathResource("/etc/secrets/firebase-service-account-key.json").getInputStream();
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
