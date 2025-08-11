@@ -14,7 +14,7 @@ import java.io.IOException;
 public class FirebaseConfig {
 
     // Inject the path. If not found, default to an empty string to prevent a crash.
-    @Value("${FIREBASE_SECRET_PATH:}")
+    @Value("${FIREBASE_SERVICE_ACCOUNT_KEY:}")
     private String serviceAccountKeyPath;
 
     @PostConstruct
