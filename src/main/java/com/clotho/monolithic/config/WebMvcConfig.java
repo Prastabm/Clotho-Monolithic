@@ -23,7 +23,7 @@ public class WebMvcConfig implements WebMvcConfigurer{
 
                 // Add the URL of your frontend application here.
                 // For development, this is typically http://localhost:3000 or http://localhost:5173
-                .allowedOrigins("http://localhost:3000", "http://localhost:5173") // Add more origins if needed
+                .allowedOrigins("http://localhost:3000", "http://localhost:5173","https://clotho-fe-isd9.vercel.app/") // Add more origins if needed
 
                 // You can use allowedOriginPatterns("*") for development, but it's less secure.
                 // .allowedOriginPatterns("*")
