@@ -7,23 +7,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream; // <-- IMPORTANT: Use FileInputStream
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @Configuration
 public class FirebaseConfig {
 
-    // Inject the file path from the environment variable you just created
-    @Value("${FIREBASE_SECRET_PATH}")
+    // Inject the path. If not found, default to an empty string to prevent a crash.
+    @Value("${FIREBASE_SECRET_PATH:}")
     private String serviceAccountKeyPath;
 
     @PostConstruct
     public void initialize() {
         try {
-            // Check if Firebase app is already initialized
-            if (FirebaseApp.getApps().isEmpty()) {
+            // Add a check to see if the path was actually provided.
+            if (serviceAccountKeyPath == null || serviceAccountKeyPath.isEmpty()) {
+                System.err.println("WARNING: FIREBASE_SECRET_PATH environment variable not set. Firebase Admin SDK will not be initialized.");
+                return; // Exit gracefully instead of crashing the application.
+            }
 
-                // Read the file from the absolute path provided by the environment variable
+            if (FirebaseApp.getApps().isEmpty()) {
                 FileInputStream serviceAccount = new FileInputStream(serviceAccountKeyPath);
 
                 FirebaseOptions options = FirebaseOptions.builder()
@@ -34,8 +37,7 @@ public class FirebaseConfig {
                 System.out.println("Firebase Admin SDK initialized successfully");
             }
         } catch (IOException e) {
-            System.err.println("Failed to initialize Firebase: " + e.getMessage());
-            // It's good practice to wrap the original exception
+            System.err.println("Failed to initialize Firebase from path: " + serviceAccountKeyPath + " - " + e.getMessage());
             throw new RuntimeException("Failed to initialize Firebase", e);
         }
     }
