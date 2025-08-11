@@ -1,21 +1,20 @@
 package com.clotho.monolithic.config;
 
-
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.PostConstruct;
+import java.io.FileInputStream; // <-- IMPORTANT: Use FileInputStream
 import java.io.IOException;
-import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${firebase.service-account-key}")
+    // Inject the file path from the environment variable you just created
+    @Value("${FIREBASE_SECRET_PATH}")
     private String serviceAccountKeyPath;
 
     @PostConstruct
@@ -23,7 +22,9 @@ public class FirebaseConfig {
         try {
             // Check if Firebase app is already initialized
             if (FirebaseApp.getApps().isEmpty()) {
-                InputStream serviceAccount = new ClassPathResource("~/etc/secrets/firebase-service-account-key.json").getInputStream();
+
+                // Read the file from the absolute path provided by the environment variable
+                FileInputStream serviceAccount = new FileInputStream(serviceAccountKeyPath);
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -34,6 +35,7 @@ public class FirebaseConfig {
             }
         } catch (IOException e) {
             System.err.println("Failed to initialize Firebase: " + e.getMessage());
+            // It's good practice to wrap the original exception
             throw new RuntimeException("Failed to initialize Firebase", e);
         }
     }
